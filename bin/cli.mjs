@@ -12,6 +12,7 @@ import {
   renderCheckReport,
   renderError,
   renderHelp,
+  renderBadge,
 } from "../lib/render/plain.mjs";
 
 const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
@@ -122,10 +123,18 @@ async function main() {
       return 0;
     }
 
+    case "badge":
+      console.log(renderBadge());
+      if (process.stderr.isTTY) {
+        console.error("\nPaste into your README. Static for now — hosted per-repo badges land with scheduled probing.");
+      }
+      return 0;
+
     case "check": {
       const failOn = validFailOn(flags);
+      const override = flags.url || flags.stdio ? targetFromFlags(flags) : null;
       if (mode === "json") {
-        const report = await checkFlow(cwd, pkg.version, failOn);
+        const report = await checkFlow(cwd, pkg.version, failOn, undefined, override);
         console.log(
           JSON.stringify(
             {
@@ -147,9 +156,9 @@ async function main() {
       }
       if (interactive) {
         const ui = await import("../lib/ui/run.mjs");
-        return ui.runCheck(cwd, pkg.version, failOn);
+        return ui.runCheck(cwd, pkg.version, failOn, override);
       }
-      const report = await checkFlow(cwd, pkg.version, failOn);
+      const report = await checkFlow(cwd, pkg.version, failOn, undefined, override);
       console.log(renderCheckReport(report));
       return report.exitCode;
     }

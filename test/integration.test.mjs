@@ -210,6 +210,34 @@ test("unreachable server → exit 2 with a one-line diagnosis", async () => {
   }
 });
 
+test("badge prints shields.io markdown", async () => {
+  const res = await runCli(["badge"], projectDir);
+  assert.equal(res.code, 0, res.stderr);
+  assert.equal(
+    res.stdout.trim(),
+    "[![MCP-tested ✓](https://img.shields.io/badge/MCP--tested-%E2%9C%93-22d3ee)](https://github.com/HBarefoot/mcp-testmate)"
+  );
+});
+
+test("check --url overrides the configured target (the GitHub Action path)", async () => {
+  // Config points at a dead port; --url redirects the check to the live fixture
+  const dir = await mkdtemp(join(tmpdir(), "mcp-testmate-override-"));
+  try {
+    await writeFile(
+      join(dir, "mcp-testmate.config.json"),
+      JSON.stringify({ target: { type: "http", url: "http://127.0.0.1:1/mcp" } })
+    );
+    await mkdir(join(dir, ".mcp-testmate"), { recursive: true });
+    await writeFile(join(dir, SNAPSHOT_REL), pristineSnapshot);
+
+    const res = await runCli(["check", "--url", baseUrl], dir);
+    assert.equal(res.code, 0, res.stderr);
+    assert.match(res.stdout, /✓ No drift — server matches snapshot/);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
 test("missing config → exit 2 with guidance", async () => {
   const emptyDir = await mkdtemp(join(tmpdir(), "mcp-testmate-empty-"));
   try {
