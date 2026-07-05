@@ -36,9 +36,16 @@
     "LICENSE"
   ],
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.29.0"
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "ink": "^7.1.0",
+    "ink-gradient": "^4.0.1",
+    "ink-spinner": "^5.0.0",
+    "react": "^19.2.7"
   },
   "scripts": {
     "test": "node --test 'test/*.test.mjs'"
+  },
+  "devDependencies": {
+    "ink-testing-library": "^4.0.0"
   }
 }

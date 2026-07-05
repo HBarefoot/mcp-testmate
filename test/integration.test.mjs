@@ -69,7 +69,7 @@ test("init against HTTP fixture writes config + capability-aware snapshot", asyn
   const res = await runCli(["init", "--url", baseUrl], projectDir);
   assert.equal(res.code, 0, res.stderr);
   assert.match(res.stdout, /demo-server v1\.2\.3/);
-  assert.match(res.stdout, /tools: 3/);
+  assert.match(res.stdout, /3 tools · 1 resources · 0 prompts/);
 
   const config = JSON.parse(await readFile(join(projectDir, "mcp-testmate.config.json"), "utf8"));
   assert.deepEqual(config, { target: { type: "http", url: baseUrl } });
@@ -92,7 +92,7 @@ test("init against HTTP fixture writes config + capability-aware snapshot", asyn
 test("check against unchanged server is clean (exit 0)", async () => {
   const res = await runCli(["check"], projectDir);
   assert.equal(res.code, 0, res.stderr);
-  assert.match(res.stdout, /✓ no drift/);
+  assert.match(res.stdout, /✓ No drift — server matches snapshot \(3 tools, \d+ms\)/);
 });
 
 test("tool removed from live server → BREAKING, exit 1", async (t) => {
@@ -183,7 +183,7 @@ test("stdio target: init + check round-trip", async () => {
 
     const check = await runCli(["check"], stdioDir);
     assert.equal(check.code, 0, check.stderr);
-    assert.match(check.stdout, /✓ no drift/);
+    assert.match(check.stdout, /✓ No drift — server matches snapshot/);
   } finally {
     await rm(stdioDir, { recursive: true, force: true });
   }
@@ -202,7 +202,8 @@ test("unreachable server → exit 2 with a one-line diagnosis", async () => {
 
     const res = await runCli(["check"], deadDir);
     assert.equal(res.code, 2);
-    assert.match(res.stderr, /server unreachable at http:\/\/127\.0\.0\.1:1\/mcp — is it running\?/);
+    assert.match(res.stderr, /✗ Could not reach http:\/\/127\.0\.0\.1:1\/mcp — is the server running\?/);
+    assert.match(res.stderr, /try: {4}start your MCP server/);
     assert.doesNotMatch(res.stderr, /at .*\.mjs:\d+/); // no stack dump
   } finally {
     await rm(deadDir, { recursive: true, force: true });
