@@ -5,6 +5,7 @@ import assert from "node:assert/strict";
 import {
   renderInitSummary,
   renderCheckReport,
+  renderTestReport,
   renderError,
   verdict,
 } from "../lib/render/plain.mjs";
@@ -120,6 +121,43 @@ test("verdict wording covers every severity mix", () => {
     verdict({ groups: g(0, 0, 3), failOn: "breaking", toolCount: 2, totalMs: 1 }).text,
     "No breaking drift — 3 informational changes (contract intact)"
   );
+});
+
+test("plain test report: per-case status, diffs, determinism guidance, verdict", () => {
+  const out = renderTestReport({
+    server: { name: "demo-server", version: "1.2.3" },
+    totalMs: 34,
+    counts: { passed: 1, failed: 1, nondeterministic: 1, recorded: 1 },
+    cases: [
+      { label: 'echo({"message":"hi"})', status: "pass", latencyMs: 12, golden: "recorded", failures: [] },
+      {
+        label: "get_status()",
+        status: "fail",
+        latencyMs: 8,
+        golden: null,
+        failures: [
+          { message: "jsonPath $.status mismatch", expected: '"rejected"', actual: '"approved"' },
+        ],
+      },
+      { label: "get_time()", status: "nondeterministic", latencyMs: 5, golden: null, failures: [] },
+    ],
+  });
+  assert.equal(
+    out,
+    [
+      "mcp-testmate test · demo-server v1.2.3",
+      "",
+      '  ✓ echo({"message":"hi"}) 12ms — golden recorded',
+      "  ✗ get_status() 8ms",
+      "      jsonPath $.status mismatch",
+      '        expected: "rejected"',
+      '        actual:   "approved"',
+      "  ⚠ get_time() 5ms — output appears non-deterministic; use contains/jsonPath instead of matchSnapshot",
+      "",
+      "✗ 1 failed, 1 non-deterministic of 3 tests",
+    ].join("\n")
+  );
+  assert.doesNotMatch(out, /\x1b\[/);
 });
 
 test("plain error block: what failed, likely cause, exact fix — no stack", () => {

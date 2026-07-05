@@ -124,7 +124,8 @@ test("HelpView: wordmark, tagline, one example per command", () => {
   assert.match(frame, /Snapshot your tools/);
   for (const example of [
     /init --url http:\/\/localhost:3000\/mcp/,
-    /check --fail-on warning/,
+    /check --all/,
+    /test --update/,
     /mcp-testmate snapshot/,
   ]) {
     assert.match(frame, example);

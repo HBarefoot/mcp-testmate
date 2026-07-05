@@ -69,7 +69,7 @@ test("init against HTTP fixture writes config + capability-aware snapshot", asyn
   const res = await runCli(["init", "--url", baseUrl], projectDir);
   assert.equal(res.code, 0, res.stderr);
   assert.match(res.stdout, /demo-server v1\.2\.3/);
-  assert.match(res.stdout, /3 tools · 1 resources · 0 prompts/);
+  assert.match(res.stdout, /4 tools · 1 resources · 0 prompts/);
 
   const config = JSON.parse(await readFile(join(projectDir, "mcp-testmate.config.json"), "utf8"));
   assert.deepEqual(config, { target: { type: "http", url: baseUrl } });
@@ -79,7 +79,7 @@ test("init against HTTP fixture writes config + capability-aware snapshot", asyn
   assert.deepEqual(snapshot.capabilities, ["resources", "tools"]);
   assert.deepEqual(
     snapshot.tools.map((t) => t.name),
-    ["add", "echo", "get_time"] // sorted by name
+    ["add", "echo", "get_status", "get_time"] // sorted by name
   );
   assert.equal(snapshot.resources.length, 1);
   // demo server declares no prompts capability → must be empty, never an error
@@ -92,7 +92,7 @@ test("init against HTTP fixture writes config + capability-aware snapshot", asyn
 test("check against unchanged server is clean (exit 0)", async () => {
   const res = await runCli(["check"], projectDir);
   assert.equal(res.code, 0, res.stderr);
-  assert.match(res.stdout, /✓ No drift — server matches snapshot \(3 tools, \d+ms\)/);
+  assert.match(res.stdout, /✓ No drift — server matches snapshot \(4 tools, \d+ms\)/);
 });
 
 test("tool removed from live server → BREAKING, exit 1", async (t) => {

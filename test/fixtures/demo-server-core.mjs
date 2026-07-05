@@ -30,8 +30,18 @@ export const TOOLS = [
     },
   },
   {
+    name: "get_status",
+    description: "Service status as JSON (deterministic — exercises jsonPath asserts)",
+    inputSchema: {
+      type: "object",
+      properties: {
+        delayMs: { type: "integer", description: "Artificial response delay (for latency tests)" },
+      },
+    },
+  },
+  {
     name: "get_time",
-    description: "Current server time as ISO string",
+    description: "Current server time as ISO string (non-deterministic — exercises the determinism guard)",
     inputSchema: { type: "object", properties: {} },
   },
 ];
@@ -61,6 +71,13 @@ export function buildDemoServer() {
         return { content: [{ type: "text", text: String(args.message) }] };
       case "add":
         return { content: [{ type: "text", text: String(args.a + args.b) }] };
+      case "get_status":
+        if (args.delayMs) await new Promise((r) => setTimeout(r, args.delayMs));
+        return {
+          content: [
+            { type: "text", text: JSON.stringify({ status: "approved", region: "us-east", checks: ["auth", "db"] }) },
+          ],
+        };
       case "get_time":
         return { content: [{ type: "text", text: new Date().toISOString() }] };
       default:
