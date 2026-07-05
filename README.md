@@ -1,5 +1,7 @@
 # mcp-testmate
 
+[![MCP-tested ✓](https://img.shields.io/badge/MCP--tested-%E2%9C%93-22d3ee)](https://github.com/HBarefoot/mcp-testmate) [![CI](https://github.com/HBarefoot/mcp-testmate/actions/workflows/ci.yml/badge.svg)](https://github.com/HBarefoot/mcp-testmate/actions/workflows/ci.yml)
+
 **Testing and reliability for MCP servers.** Snapshot your tool schemas, catch drift before your users do, regression-test your responses, and know the moment your production MCP server breaks.
 
 <!-- TODO: replace with real capture — docs/assets/init-demo.gif (interactive `init` with gradient wordmark, spinner phases, summary card) -->
@@ -46,6 +48,39 @@ Exit codes are CI-friendly: `0` clean (or INFO-only), `1` breaking drift (`--fai
 
 **Capability-aware by design:** mcp-testmate reads your server's declared capabilities after `initialize` and only introspects what the server actually claims. A server that doesn't implement prompts or resources is never queried for them — and never penalized.
 
+## GitHub Action
+
+Run `check` on every PR **and on a schedule** — the cron matters, because schema drift happens *without* code changes: a dependency bump, a spec revision, or a remote server update can change your tool surface while your repo sits still.
+
+```yaml
+name: MCP drift check
+on:
+  pull_request:
+  schedule:
+    - cron: "0 6 * * 1" # weekly — drift happens without code changes
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: HBarefoot/mcp-testmate@main
+        with:
+          start: node server.mjs # launches your server, waits until `url` responds
+          url: http://127.0.0.1:3000/mcp
+```
+
+Inputs: `url` or `stdio` (override the committed config's target — handy when CI runs the server on localhost), `fail-on` (`breaking`, default, or `warning`), `working-directory`, and `start` (background-launch command for HTTP targets; stdio targets don't need it — the CLI spawns those itself). If your repo has `mcp-testmate` installed as a devDependency the action uses that pinned version, otherwise it runs the latest release via `npx`.
+
+### Badge
+
+```console
+$ npx mcp-testmate badge
+[![MCP-tested ✓](https://img.shields.io/badge/MCP--tested-%E2%9C%93-22d3ee)](https://github.com/HBarefoot/mcp-testmate)
+```
+
+Paste it into your README to show your MCP server is drift-tested. Static for now — hosted per-repo badges land with scheduled probing.
+
 ## Why
 
 MCP servers break silently: spec revisions, dependency bumps, client differences. The official conformance suite answers *"does this implementation conform to the protocol?"* — mcp-testmate answers the question it never will: **"does MY server, with MY tools, still behave the way it did yesterday — and is it up right now?"**
@@ -57,13 +92,13 @@ MCP servers break silently: spec revisions, dependency bumps, client differences
 - **Both transports** — Streamable HTTP (`--url`) and stdio (`--stdio`) from day one
 - **Capability-aware introspection** — only queries what your server declares
 - **Dual renderer** — polished interactive terminal UI (built on [Ink](https://github.com/vadimdemedes/ink)), automatic clean plain-text output in CI and pipes
+- **GitHub Action + badge** — drop-in CI with PR + scheduled drift checks, `MCP-tested ✓`
 
 ## What's coming
 
 - **Response regression tests** — golden-output assertions on your actual tools
 - **Capability-aware conformance** — wraps the official suite, skips what your server doesn't claim
 - **Latency baselines** — catch performance regressions per tool
-- **GitHub Action + badge** — `MCP-tested ✓`
 - **Scheduled production probing** — hosted monitoring, drift alerts, status pages *(paid tier)*
 
 See [docs/ROADMAP.md](docs/ROADMAP.md).
