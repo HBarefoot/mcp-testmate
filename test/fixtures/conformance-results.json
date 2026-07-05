@@ -1,0 +1,315 @@
+{
+  "suiteVersion": "0.1.16",
+  "capturedAt": "2026-07-05",
+  "target": "test/fixtures/demo-server.mjs (streamable HTTP)",
+  "scenarios": [
+    {
+      "name": "completion-complete",
+      "passed": false,
+      "checks": [
+        {
+          "id": "completion-complete",
+          "status": "FAILURE"
+        }
+      ]
+    },
+    {
+      "name": "dns-rebinding-protection",
+      "passed": false,
+      "checks": [
+        {
+          "id": "localhost-host-rebinding-rejected",
+          "status": "FAILURE"
+        },
+        {
+          "id": "localhost-host-valid-accepted",
+          "status": "SUCCESS"
+        }
+      ]
+    },
+    {
+      "name": "elicitation-sep1034-defaults",
+      "passed": false,
+      "checks": [
+        {
+          "id": "elicitation-sep1034-general",
+          "status": "FAILURE"
+        }
+      ]
+    },
+    {
+      "name": "elicitation-sep1330-enums",
+      "passed": false,
+      "checks": [
+        {
+          "id": "elicitation-sep1330-general",
+          "status": "FAILURE"
+        }
+      ]
+    },
+    {
+      "name": "logging-set-level",
+      "passed": false,
+      "checks": [
+        {
+          "id": "logging-set-level",
+          "status": "FAILURE"
+        }
+      ]
+    },
+    {
+      "name": "ping",
+      "passed": true,
+      "checks": [
+        {
+          "id": "ping",
+          "status": "SUCCESS"
+        }
+      ]
+    },
+    {
+      "name": "prompts-get-embedded-resource",
+      "passed": false,
+      "checks": [
+        {
+          "id": "prompts-get-embedded-resource",
+          "status": "FAILURE"
+        }
+      ]
+    },
+    {
+      "name": "prompts-get-simple",
+      "passed": false,
+      "checks": [
+        {
+          "id": "prompts-get-simple",
+          "status": "FAILURE"
+        }
+      ]
+    },
+    {
+      "name": "prompts-get-with-args",
+      "passed": false,
+      "checks": [
+        {
+          "id": "prompts-get-with-args",
+          "status": "FAILURE"
+        }
+      ]
+    },
+    {
+      "name": "prompts-get-with-image",
+      "passed": false,
+      "checks": [
+        {
+          "id": "prompts-get-with-image",
+          "status": "FAILURE"
+        }
+      ]
+    },
+    {
+      "name": "prompts-list",
+      "passed": false,
+      "checks": [
+        {
+          "id": "prompts-list",
+          "status": "FAILURE"
+        }
+      ]
+    },
+    {
+      "name": "resources-list",
+      "passed": true,
+      "checks": [
+        {
+          "id": "resources-list",
+          "status": "SUCCESS"
+        }
+      ]
+    },
+    {
+      "name": "resources-read-binary",
+      "passed": false,
+      "checks": [
+        {
+          "id": "resources-read-binary",
+          "status": "FAILURE"
+        }
+      ]
+    },
+    {
+      "name": "resources-read-text",
+      "passed": true,
+      "checks": [
+        {
+          "id": "resources-read-text",
+          "status": "SUCCESS"
+        }
+      ]
+    },
+    {
+      "name": "resources-subscribe",
+      "passed": false,
+      "checks": [
+        {
+          "id": "resources-subscribe",
+          "status": "FAILURE"
+        }
+      ]
+    },
+    {
+      "name": "resources-templates-read",
+      "passed": false,
+      "checks": [
+        {
+          "id": "resources-templates-read",
+          "status": "FAILURE"
+        }
+      ]
+    },
+    {
+      "name": "resources-unsubscribe",
+      "passed": false,
+      "checks": [
+        {
+          "id": "resources-unsubscribe",
+          "status": "FAILURE"
+        }
+      ]
+    },
+    {
+      "name": "server-initialize",
+      "passed": true,
+      "checks": [
+        {
+          "id": "server-initialize",
+          "status": "SUCCESS"
+        }
+      ]
+    },
+    {
+      "name": "server-sse-multiple-streams",
+      "passed": true,
+      "checks": [
+        {
+          "id": "server-accepts-multiple-post-streams",
+          "status": "SUCCESS"
+        },
+        {
+          "id": "server-sse-streams-functional",
+          "status": "SUCCESS"
+        }
+      ]
+    },
+    {
+      "name": "tools-call-audio",
+      "passed": false,
+      "checks": [
+        {
+          "id": "tools-call-audio",
+          "status": "FAILURE"
+        }
+      ]
+    },
+    {
+      "name": "tools-call-elicitation",
+      "passed": false,
+      "checks": [
+        {
+          "id": "tools-call-elicitation",
+          "status": "FAILURE"
+        }
+      ]
+    },
+    {
+      "name": "tools-call-embedded-resource",
+      "passed": false,
+      "checks": [
+        {
+          "id": "tools-call-embedded-resource",
+          "status": "FAILURE"
+        }
+      ]
+    },
+    {
+      "name": "tools-call-error",
+      "passed": true,
+      "checks": [
+        {
+          "id": "tools-call-error",
+          "status": "SUCCESS"
+        }
+      ]
+    },
+    {
+      "name": "tools-call-image",
+      "passed": false,
+      "checks": [
+        {
+          "id": "tools-call-image",
+          "status": "FAILURE"
+        }
+      ]
+    },
+    {
+      "name": "tools-call-mixed-content",
+      "passed": false,
+      "checks": [
+        {
+          "id": "tools-call-mixed-content",
+          "status": "FAILURE"
+        }
+      ]
+    },
+    {
+      "name": "tools-call-sampling",
+      "passed": false,
+      "checks": [
+        {
+          "id": "tools-call-sampling",
+          "status": "FAILURE"
+        }
+      ]
+    },
+    {
+      "name": "tools-call-simple-text",
+      "passed": true,
+      "checks": [
+        {
+          "id": "tools-call-simple-text",
+          "status": "SUCCESS"
+        }
+      ]
+    },
+    {
+      "name": "tools-call-with-logging",
+      "passed": false,
+      "checks": [
+        {
+          "id": "tools-call-with-logging",
+          "status": "FAILURE"
+        }
+      ]
+    },
+    {
+      "name": "tools-call-with-progress",
+      "passed": false,
+      "checks": [
+        {
+          "id": "tools-call-with-progress",
+          "status": "FAILURE"
+        }
+      ]
+    },
+    {
+      "name": "tools-list",
+      "passed": true,
+      "checks": [
+        {
+          "id": "tools-list",
+          "status": "SUCCESS"
+        }
+      ]
+    }
+  ]
+}
