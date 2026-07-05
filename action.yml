@@ -18,6 +18,10 @@ inputs:
     description: "Severity that fails the build: breaking | warning"
     required: false
     default: "breaking"
+  all:
+    description: "Also run response-regression tests (`check --all`) when the config defines a tests array"
+    required: false
+    default: "false"
   working-directory:
     description: "Directory containing mcp-testmate.config.json and .mcp-testmate/ (default: repo root)"
     required: false
@@ -71,8 +75,10 @@ runs:
         MTM_URL: ${{ inputs.url }}
         MTM_STDIO: ${{ inputs.stdio }}
         MTM_FAIL_ON: ${{ inputs.fail-on }}
+        MTM_ALL: ${{ inputs.all }}
       run: |
         args=(check --fail-on "$MTM_FAIL_ON")
+        [ "$MTM_ALL" = "true" ] && args+=(--all)
         [ -n "$MTM_URL" ] && args+=(--url "$MTM_URL")
         [ -n "$MTM_STDIO" ] && args+=(--stdio "$MTM_STDIO")
         # Prefer the repo's own pinned install (devDependency) when present;

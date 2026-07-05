@@ -1,0 +1,16 @@
+{
+  "mcpTestmateGolden": 1,
+  "tool": "echo",
+  "args": {
+    "message": "dogfood"
+  },
+  "recordedAt": "2026-07-05T04:35:55.567Z",
+  "output": {
+    "content": [
+      {
+        "text": "dogfood",
+        "type": "text"
+      }
+    ]
+  }
+}

@@ -2,5 +2,44 @@
   "target": {
     "type": "http",
     "url": "http://127.0.0.1:7399/mcp"
-  }
+  },
+  "tests": [
+    {
+      "tool": "echo",
+      "args": {
+        "message": "dogfood"
+      },
+      "expect": {
+        "matchSnapshot": true,
+        "contains": "dogfood"
+      }
+    },
+    {
+      "tool": "add",
+      "args": {
+        "a": 2,
+        "b": 3
+      },
+      "expect": {
+        "contains": "5",
+        "maxLatencyMs": 2000
+      }
+    },
+    {
+      "tool": "get_status",
+      "args": {},
+      "expect": {
+        "jsonPath": "$.status",
+        "equals": "approved"
+      }
+    },
+    {
+      "tool": "get_time",
+      "args": {},
+      "expect": {
+        "contains": "T",
+        "maxLatencyMs": 2000
+      }
+    }
+  ]
 }

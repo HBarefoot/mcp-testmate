@@ -24,8 +24,9 @@ jobs:
           npm ci
           mkdir -p node_modules/.bin
           ln -sf "$PWD/bin/cli.mjs" node_modules/.bin/mcp-testmate
-      - name: Check fixture server for drift
+      - name: Check fixture server for drift + response regressions
         uses: ./
         with:
           start: node test/fixtures/demo-server.mjs 7399
           url: http://127.0.0.1:7399/mcp
+          all: "true"

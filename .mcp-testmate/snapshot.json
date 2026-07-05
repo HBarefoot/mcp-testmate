@@ -1,6 +1,6 @@
 {
   "mcpTestmate": 1,
-  "createdAt": "2026-07-05T04:25:02.672Z",
+  "createdAt": "2026-07-05T04:35:55.461Z",
   "target": {
     "type": "http",
     "url": "http://127.0.0.1:7399/mcp"
@@ -54,8 +54,21 @@
       }
     },
     {
+      "name": "get_status",
+      "description": "Service status as JSON (deterministic — exercises jsonPath asserts)",
+      "inputSchema": {
+        "properties": {
+          "delayMs": {
+            "description": "Artificial response delay (for latency tests)",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
       "name": "get_time",
-      "description": "Current server time as ISO string",
+      "description": "Current server time as ISO string (non-deterministic — exercises the determinism guard)",
       "inputSchema": {
         "properties": {},
         "type": "object"
@@ -71,7 +84,7 @@
   ],
   "prompts": [],
   "timings": {
-    "connectMs": 28,
+    "connectMs": 26,
     "listToolsMs": 2
   }
 }
