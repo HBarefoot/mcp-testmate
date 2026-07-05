@@ -1,7 +1,7 @@
 {
   "name": "mcp-testmate",
   "version": "0.3.0",
-  "description": "Testing, snapshot regression, and reliability monitoring for MCP servers. Schema drift detection, response regression, latency baselines, and CI for the Model Context Protocol. Coming soon.",
+  "description": "Testing, snapshot regression, and reliability monitoring for MCP servers. Schema drift detection, response regression, latency baselines, and CI for the Model Context Protocol.",
   "bin": {
     "mcp-testmate": "bin/cli.mjs"
   },
@@ -43,9 +43,14 @@
     "react": "^19.2.7"
   },
   "scripts": {
-    "test": "node --test test/*.test.mjs"
+    "test": "node --test test/*.test.mjs",
+    "preflight": "node scripts/preflight.mjs"
   },
   "devDependencies": {
     "ink-testing-library": "^4.0.0"
+  },
+  "homepage": "https://github.com/HBarefoot/mcp-testmate#readme",
+  "bugs": {
+    "url": "https://github.com/HBarefoot/mcp-testmate/issues"
   }
 }

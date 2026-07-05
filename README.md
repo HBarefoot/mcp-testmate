@@ -2,6 +2,8 @@
 
 [![MCP-tested ✓](https://img.shields.io/badge/MCP--tested-%E2%9C%93-22d3ee)](https://github.com/HBarefoot/mcp-testmate) [![CI](https://github.com/HBarefoot/mcp-testmate/actions/workflows/ci.yml/badge.svg)](https://github.com/HBarefoot/mcp-testmate/actions/workflows/ci.yml)
 
+> **⚠️ Not on npm yet.** `npm install mcp-testmate` currently resolves a v0.0.1 name-claim placeholder — v0.3.0 publishes shortly. Until then: `git clone` this repo, `npm ci`, and run `node bin/cli.mjs`. *(This callout is deleted on publish day.)*
+
 **Testing and reliability for MCP servers.** Snapshot your tool schemas, catch drift before your users do, regression-test your responses, and know the moment your production MCP server breaks.
 
 ![mcp-testmate init — snapshot an MCP server's tools, resources, and schemas](docs/assets/init-demo.gif)
@@ -115,7 +117,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: HBarefoot/mcp-testmate@main
+      - uses: HBarefoot/mcp-testmate@v0.3.0
         with:
           start: node server.mjs # launches your server, waits until `url` responds
           url: http://127.0.0.1:3000/mcp
@@ -153,5 +155,7 @@ MCP servers break silently: spec revisions, dependency bumps, client differences
 - **Scheduled production probing** — hosted monitoring, drift alerts, status pages *(paid tier)*
 
 See [docs/ROADMAP.md](docs/ROADMAP.md).
+
+**Run MCP in production?** [Tell us what broke](https://github.com/HBarefoot/mcp-testmate/issues/new?template=production-user.yml) — production pain reports directly shape the hosted probing tier.
 
 MIT · by [Henry Barefoot](https://barefootdigital.dev)
