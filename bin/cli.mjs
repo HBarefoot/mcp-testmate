@@ -7,12 +7,14 @@ import { UserError } from "../lib/errors.mjs";
 import { parseCommandString } from "../lib/target.mjs";
 import { initFlow, snapshotFlow, checkFlow } from "../lib/commands.mjs";
 import { testFlow } from "../lib/test-runner.mjs";
+import { conformanceFlow } from "../lib/conformance.mjs";
 import { loadConfig } from "../lib/snapshot.mjs";
 import {
   renderInitSummary,
   renderSnapshotSummary,
   renderCheckReport,
   renderTestReport,
+  renderConformanceReport,
   renderError,
   renderHelp,
   renderBadge,
@@ -27,7 +29,14 @@ function parseArgs(argv) {
     const arg = rest[i];
     if (!arg.startsWith("--")) throw new UserError(`Unexpected argument: ${arg}`);
     const name = arg.slice(2);
-    if (name === "json" || name === "no-color" || name === "update" || name === "all") {
+    if (
+      name === "json" ||
+      name === "no-color" ||
+      name === "update" ||
+      name === "all" ||
+      name === "strict" ||
+      name === "conformance"
+    ) {
       flags[name] = true;
     } else if (name === "url" || name === "stdio" || name === "fail-on") {
       const value = rest[++i];
@@ -89,6 +98,20 @@ function testReportJson(report) {
   };
 }
 
+function conformanceReportJson(report) {
+  return {
+    ok: report.exitCode === 0,
+    exitCode: report.exitCode,
+    server: report.server,
+    suiteVersion: report.suiteVersion,
+    mapVersion: report.mapVersion,
+    strict: report.strict,
+    counts: report.counts,
+    scenarios: report.scenarios,
+    notes: report.notes,
+  };
+}
+
 async function main() {
   const { command, flags } = parseArgs(process.argv.slice(2));
   if (flags["no-color"]) process.env.NO_COLOR = "1";
@@ -97,6 +120,12 @@ async function main() {
   }
   if (flags.all && command !== "check") {
     throw new UserError("--all only applies to `mcp-testmate check`");
+  }
+  if (flags.strict && command !== "conformance") {
+    throw new UserError("--strict only applies to `mcp-testmate conformance`");
+  }
+  if (flags.conformance && !(command === "check" && flags.all)) {
+    throw new UserError("--conformance only applies to `mcp-testmate check --all`");
   }
   const cwd = process.cwd();
   const mode = uiMode(flags);
@@ -166,6 +195,23 @@ async function main() {
       return report.exitCode;
     }
 
+    case "conformance": {
+      const override = flags.url || flags.stdio ? targetFromFlags(flags) : null;
+      const opts = { strict: !!flags.strict, targetOverride: override };
+      if (mode === "json") {
+        const report = await conformanceFlow(cwd, pkg.version, opts);
+        console.log(JSON.stringify(conformanceReportJson(report), null, 2));
+        return report.exitCode;
+      }
+      if (interactive) {
+        const ui = await import("../lib/ui/run.mjs");
+        return ui.runConformance(cwd, pkg.version, opts);
+      }
+      const report = await conformanceFlow(cwd, pkg.version, opts);
+      console.log(renderConformanceReport(report));
+      return report.exitCode;
+    }
+
     case "check": {
       const failOn = validFailOn(flags);
       const override = flags.url || flags.stdio ? targetFromFlags(flags) : null;
@@ -198,29 +244,41 @@ async function main() {
         const tests = hasTests
           ? testReportJson(await testFlow(cwd, pkg.version, { targetOverride: override }))
           : null;
-        const exitCode = Math.max(report.exitCode, tests?.exitCode ?? 0);
+        const conformance = flags.conformance
+          ? conformanceReportJson(await conformanceFlow(cwd, pkg.version, { targetOverride: override }))
+          : null;
+        const exitCode = Math.max(report.exitCode, tests?.exitCode ?? 0, conformance?.exitCode ?? 0);
         console.log(
-          JSON.stringify({ ok: exitCode === 0, exitCode, drift: driftJson, tests }, null, 2)
+          JSON.stringify({ ok: exitCode === 0, exitCode, drift: driftJson, tests, conformance }, null, 2)
         );
         return exitCode;
       }
 
       if (interactive) {
         const ui = await import("../lib/ui/run.mjs");
-        if (flags.all) return ui.runCheckAll(cwd, pkg.version, failOn, override, hasTests);
+        if (flags.all) {
+          return ui.runCheckAll(cwd, pkg.version, failOn, override, hasTests, !!flags.conformance);
+        }
         return ui.runCheck(cwd, pkg.version, failOn, override);
       }
 
       const report = await checkFlow(cwd, pkg.version, failOn, undefined, override);
       console.log(renderCheckReport(report));
       if (!flags.all) return report.exitCode;
-      if (!hasTests) {
+      let exitCode = report.exitCode;
+      if (hasTests) {
+        const testReport = await testFlow(cwd, pkg.version, { targetOverride: override });
+        console.log("\n" + renderTestReport(testReport));
+        exitCode = Math.max(exitCode, testReport.exitCode);
+      } else {
         console.log('\n(no tests configured — add a "tests" array to also run response tests)');
-        return report.exitCode;
       }
-      const testReport = await testFlow(cwd, pkg.version, { targetOverride: override });
-      console.log("\n" + renderTestReport(testReport));
-      return Math.max(report.exitCode, testReport.exitCode);
+      if (flags.conformance) {
+        const confReport = await conformanceFlow(cwd, pkg.version, { targetOverride: override });
+        console.log("\n" + renderConformanceReport(confReport));
+        exitCode = Math.max(exitCode, confReport.exitCode);
+      }
+      return exitCode;
     }
 
     default:
