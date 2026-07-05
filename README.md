@@ -4,8 +4,7 @@
 
 **Testing and reliability for MCP servers.** Snapshot your tool schemas, catch drift before your users do, regression-test your responses, and know the moment your production MCP server breaks.
 
-<!-- TODO: replace with real capture — docs/assets/init-demo.gif (interactive `init` with gradient wordmark, spinner phases, summary card) -->
-![mcp-testmate init — interactive terminal UI](docs/assets/init-demo.gif)
+![mcp-testmate init — snapshot an MCP server's tools, resources, and schemas](docs/assets/init-demo.gif)
 
 ## Quick Start
 
@@ -24,7 +23,11 @@ git add mcp-testmate.config.json .mcp-testmate/snapshot.json
 npx mcp-testmate check
 ```
 
-`check` re-introspects the live server, diffs it against the committed snapshot, and classifies every change. This is exactly what your CI log shows:
+`check` re-introspects the live server, diffs it against the committed snapshot, and classifies every change:
+
+![mcp-testmate check — breaking drift caught with mini-diffs](docs/assets/check-demo.gif)
+
+This is exactly what your CI log shows:
 
 ```
 mcp-testmate check · demo-server v1.3.0
