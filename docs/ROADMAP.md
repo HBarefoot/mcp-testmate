@@ -8,8 +8,8 @@ The core open-source tool: `mcp-testmate init` connects to your MCP server (stdi
 - [x] stdio and Streamable HTTP targets (v0.1)
 - [x] Capability-aware introspection (v0.1)
 - [x] Branded terminal UI + plain CI renderer + `--json` (v0.1)
-- [ ] Response regression tests (golden outputs)
-- [ ] Latency baselines
+- [x] Response regression tests — goldens, contains/jsonPath, latency budgets, determinism guard (v0.3)
+- [ ] Latency baselines (automatic per-tool; explicit `maxLatencyMs` budgets shipped in v0.3)
 - [ ] Capability-aware conformance wrapper
 
 ## Stage 2 — GitHub Action + badge
