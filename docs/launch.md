@@ -34,4 +34,24 @@ They're complementary: conformance for the protocol layer, mcp-testmate for your
 - Repo: https://github.com/HBarefoot/mcp-testmate
 - Roadmap: https://github.com/HBarefoot/mcp-testmate/blob/main/docs/ROADMAP.md
 - Conformance-suite audit notes (the anecdote in full): https://github.com/HBarefoot/mcp-testmate/blob/main/docs/audit-official-conformance.md
-- npm: https://www.npmjs.com/package/mcp-testmate *(placeholder until 0.3.0 is published)*
+- npm: https://www.npmjs.com/package/mcp-testmate *(goes live with the 0.4.0 publish — verify before posting)*
+
+## Predicted questions (paste-ready replies)
+
+**"How is this different from the official conformance suite?"**
+It's a complement, not a competitor — `mcp-testmate conformance` literally runs the official suite and keeps its verdicts. What we add is capability awareness: the official suite has none, so our valid demo server scores 10 passed / 22 failed raw — every scenario for capabilities it never declared, plus fixture-style scenarios only purpose-built demo servers can pass. Run through mcp-testmate, the same results become "1 of 9 applicable failed" — and that one failure was real (our fixture lacked DNS-rebinding protection; the wrapper surfaced it out of the noise). Full hands-on audit: docs/audit-official-conformance.md. The rest of the tool (snapshots, drift diffs, golden-output tests) covers ground no conformance suite can — your specific tools.
+
+**"Why not OpenAPI / Pact / Schemathesis?"**
+MCP isn't REST — there's no OpenAPI document to test against. Tool schemas live inside a JSON-RPC envelope, negotiated per-session after an `initialize` handshake that declares capabilities, over two transports (stdio and streamable HTTP with SSE and session management). Those tools operate at the wrong layer; mcp-testmate speaks the protocol natively via the official MCP SDK and snapshots what a client actually sees.
+
+**"Does it work with stdio servers?"**
+Yes — `init`, `check`, `test`, and the drift engine fully support stdio (`--stdio "node server.mjs"`); the CLI spawns your server itself. The one exception is `conformance`, which is HTTP-only because the official suite it wraps only accepts `--url`. If your stdio server also exposes streamable HTTP, point conformance at that.
+
+**"What's the business model?"**
+The CLI and GitHub Action are MIT and stay free — that's the whole CI story. The paid tier on the roadmap is hosted scheduled probing of production servers: uptime, drift against your committed baseline, and latency alerts with status pages — CI tells you a change broke something; probing tells you production broke when nothing was deployed. If you run MCP in production, the "I run MCP in production" issue template is where that tier is being shaped.
+
+**"How do you handle non-deterministic tool outputs?"**
+When a golden-snapshot test fails, mcp-testmate calls the tool a second time before reporting anything. If the two live outputs also differ from each other, you get "output appears non-deterministic; use contains/jsonPath instead of matchSnapshot" — pointing at the assertion types built for that — instead of a fake regression. Flaky failures kill trust in a testing tool faster than missed bugs, so we treat them as our bug, not yours.
+
+**"Yet another wrapper?"**
+The wrapper is one command of six. The core — capability-aware introspection, byte-stable snapshots, the breaking/warning/info drift classifier, golden-output regression tests with the determinism guard — is original code with a single runtime dependency (the official MCP SDK) plus Ink for the interactive terminal UI. Nothing shells out except `conformance`, which pins and runs the official suite because reimplementing protocol conformance would be the actual wrapper crime.
