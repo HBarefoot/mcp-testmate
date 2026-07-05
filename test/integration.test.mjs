@@ -17,9 +17,9 @@ let baseUrl;
 let projectDir; // temp dir acting as the user's repo
 let pristineSnapshot; // snapshot text right after init, for restore between tests
 
-function runCli(args, cwd) {
+function runCli(args, cwd, env = {}) {
   return new Promise((resolve, reject) => {
-    const child = spawn(process.execPath, [CLI, ...args], { cwd });
+    const child = spawn(process.execPath, [CLI, ...args], { cwd, env: { ...process.env, ...env } });
     let stdout = "";
     let stderr = "";
     child.stdout.on("data", (d) => (stdout += d));
@@ -93,6 +93,16 @@ test("check against unchanged server is clean (exit 0)", async () => {
   const res = await runCli(["check"], projectDir);
   assert.equal(res.code, 0, res.stderr);
   assert.match(res.stdout, /✓ No drift — server matches snapshot \(4 tools, \d+ms\)/);
+});
+
+test("interactive (Ink) renderer emits the check report, not just the spinner", async () => {
+  // Regression guard: the Ink path once dropped the final report because the
+  // view prop didn't match what withProgress passed. Forcing the interactive
+  // renderer in a pipe makes Ink write its frames to stdout, so the report
+  // text must appear.
+  const res = await runCli(["check"], projectDir, { MCP_TESTMATE_UI: "interactive" });
+  assert.equal(res.code, 0, res.stderr);
+  assert.match(res.stdout, /No drift — server matches snapshot/);
 });
 
 test("tool removed from live server → BREAKING, exit 1", async (t) => {

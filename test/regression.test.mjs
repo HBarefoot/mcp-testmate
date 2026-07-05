@@ -17,9 +17,9 @@ let fixture;
 let baseUrl;
 let projectDir;
 
-function runCli(args, cwd = projectDir) {
+function runCli(args, cwd = projectDir, env = {}) {
   return new Promise((resolve, reject) => {
-    const child = spawn(process.execPath, [CLI, ...args], { cwd });
+    const child = spawn(process.execPath, [CLI, ...args], { cwd, env: { ...process.env, ...env } });
     let stdout = "";
     let stderr = "";
     child.stdout.on("data", (d) => (stdout += d));
@@ -227,6 +227,13 @@ test("check --all runs drift + tests; exit is the worst of both", async () => {
   assert.equal(combined.ok, false);
   assert.equal(combined.drift.counts.breaking, 0);
   assert.equal(combined.tests.counts.failed, 1);
+});
+
+test("interactive (Ink) renderer emits the test report, not just the spinner", async () => {
+  await setTests([{ tool: "add", args: { a: 1, b: 2 }, expect: { contains: "3" } }]);
+  const res = await runCli(["test"], projectDir, { MCP_TESTMATE_UI: "interactive" });
+  assert.equal(res.code, 0, res.stderr);
+  assert.match(res.stdout, /1 test passed/);
 });
 
 test("config validation: unknown expect key is rejected with guidance (exit 2)", async () => {
