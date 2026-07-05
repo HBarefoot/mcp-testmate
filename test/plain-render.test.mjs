@@ -39,10 +39,12 @@ test("plain init summary is stable", () => {
       "Next steps:",
       "  1. Commit the baseline:  git add mcp-testmate.config.json .mcp-testmate/",
       "  2. Check for drift:      mcp-testmate check",
-      "  3. Wire it into CI so schema drift fails the build",
+      "  3. Add the GitHub Action so drift fails the build — README § CI",
     ].join("\n")
   );
   assert.doesNotMatch(out, /\x1b\[/); // no ANSI, ever
+  // the Action shipped in v0.2.0 — first-run copy must never advertise it as future
+  assert.doesNotMatch(out, /coming soon/i);
 });
 
 test("plain check report groups severities and ends with the verdict", () => {

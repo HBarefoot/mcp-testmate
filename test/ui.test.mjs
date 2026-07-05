@@ -46,6 +46,8 @@ test("InitView: result shows summary card, chips, and next steps", () => {
   assert.match(frame, /\.mcp-testmate\/snapshot\.json/);
   assert.match(frame, /Next steps/);
   assert.match(frame, /mcp-testmate check/);
+  assert.match(frame, /Add the GitHub Action/);
+  assert.doesNotMatch(frame, /coming soon/i); // Action shipped in v0.2.0
   unmount();
 });
 
