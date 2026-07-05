@@ -2,6 +2,16 @@
 
 All notable changes to mcp-testmate. Format loosely follows [Keep a Changelog](https://keepachangelog.com/); versions follow semver.
 
+## [0.4.0] — 2026-07-05
+
+### Added
+- **`mcp-testmate conformance`** — capability-aware wrapper around the official `@modelcontextprotocol/conformance` suite (pinned 0.1.16, spawned via `npx`). Scenarios are classified against the server's *declared* capabilities: **applicable** (official PASS/FAIL stands), **skipped — capability not declared**, **skipped — fixture-only** (scenarios that validate purpose-built demo servers). Sub-capabilities honored (`resources.subscribe`). Same suite, real signal: our demo server goes from "22 failures" raw to "1 real failure, 21 skipped with reasons".
+- `--strict` — raw official behavior, no skipping.
+- Config `"conformance": { "include": [...] }` opts individual fixture scenarios in.
+- Versioned scenario→capability map (`lib/conformance-map.mjs`); unknown scenarios from newer suites default to applicable with a note.
+- `check --all --conformance` — conformance as a third CI section (off by default: it network-fetches and runs the official suite, ~30–60s).
+- HTTP-only guard: stdio targets exit 2 with guidance (the official suite tests HTTP servers only).
+
 ## [0.3.0] — 2026-07-05
 
 ### Added

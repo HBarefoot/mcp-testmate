@@ -101,6 +101,42 @@ Goldens follow the Jest convention: missing → recorded (not failed); intention
 
 **Capability-aware by design:** mcp-testmate reads your server's declared capabilities after `initialize` and only introspects what the server actually claims. A server that doesn't implement prompts or resources is never queried for them — and never penalized.
 
+## Conformance (wraps the official suite)
+
+The official [`@modelcontextprotocol/conformance`](https://www.npmjs.com/package/@modelcontextprotocol/conformance) suite validates protocol behavior — but it has no capability awareness, so a perfectly valid production server "fails" most of it: every scenario for resources/prompts/logging it never declared, plus fixture-style scenarios (image/audio/embedded-resource/sampling/elicitation) that only purpose-built demo servers can pass. Our demo server — a valid, working MCP server — scores **8 passed / 22 failed** on the raw suite ([full audit](docs/audit-official-conformance.md)).
+
+`mcp-testmate conformance` runs the same official suite (pinned to 0.1.16), then classifies every scenario against what your server *declares*:
+
+```console
+$ mcp-testmate conformance
+mcp-testmate conformance · demo-server v1.2.3 · official suite 0.1.16
+
+APPLICABLE (9)
+  ✗ dns-rebinding-protection
+  ✓ ping
+  ✓ resources-list
+  …
+
+SKIPPED · capability not declared (9)
+  completions: completion-complete
+  logging: logging-set-level
+  prompts: prompts-list, prompts-get-simple, …
+  resources.subscribe: resources-subscribe, resources-unsubscribe
+
+SKIPPED · fixture-only (12)
+  tools-call-image, tools-call-audio, tools-call-sampling, …
+
+✗ official suite: 1 of 9 applicable scenarios failed (not declared: completions, logging, prompts, resources.subscribe · fixture-only: 12)
+```
+
+Same server, same official suite — but instead of "22 failures", you get the one failure that's real (our demo server genuinely lacks DNS-rebinding protection) and 21 skips, each with its reason. Sub-capabilities count: `resources-subscribe` is only applicable if your server declares `resources.subscribe`.
+
+- `--strict` disables all skipping (raw official behavior).
+- Fixture scenarios can be opted in per-scenario: `"conformance": { "include": ["tools-call-image"] }` in the config.
+- Scenarios unknown to the mapping (newer suite releases) default to **applicable** with a note — over-testing beats silent skipping.
+- Exit codes: `0` all applicable passed, `1` applicable failure, `2` runtime error. stdio targets exit 2 — the official suite tests HTTP servers only.
+- `mcp-testmate check --all --conformance` adds it as a third CI section. It's **off by default** because it spawns the official suite via `npx` (network fetch, ~30–60s) — drift + response tests stay fast on every push; add conformance to your scheduled run.
+
 ## GitHub Action
 
 Run `check` on every PR **and on a schedule** — the cron matters, because schema drift happens *without* code changes: a dependency bump, a spec revision, or a remote server update can change your tool surface while your repo sits still.
@@ -147,10 +183,10 @@ MCP servers break silently: spec revisions, dependency bumps, client differences
 - **Capability-aware introspection** — only queries what your server declares
 - **Dual renderer** — polished interactive terminal UI (built on [Ink](https://github.com/vadimdemedes/ink)), automatic clean plain-text output in CI and pipes
 - **GitHub Action + badge** — drop-in CI with PR + scheduled drift checks, `MCP-tested ✓`
+- **Capability-aware conformance** — wraps the official suite; skips what your server doesn't claim, with reasons
 
 ## What's coming
 
-- **Capability-aware conformance** — wraps the official suite, skips what your server doesn't claim
 - **Latency baselines** — automatic per-tool baselines (today: explicit `maxLatencyMs` budgets)
 - **Scheduled production probing** — hosted monitoring, drift alerts, status pages *(paid tier)*
 
