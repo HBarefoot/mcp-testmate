@@ -1,0 +1,43 @@
+name: Bug report
+description: Something broke, crashed, or reported the wrong thing
+labels: [bug]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: mcp-testmate version
+      placeholder: "npx mcp-testmate --version"
+    validations:
+      required: true
+  - type: dropdown
+    id: transport
+    attributes:
+      label: Target transport
+      options:
+        - Streamable HTTP (--url)
+        - stdio (--stdio)
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: Include the full command and its output. If a check/test result looks wrong, include the relevant snapshot/golden snippet.
+      placeholder: |
+        $ mcp-testmate check
+        ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: checkboxes
+    id: flaky
+    attributes:
+      label: Flakiness
+      description: Flaky or wrong results are our highest-priority bug class.
+      options:
+        - label: This result is intermittent (passes sometimes, fails sometimes)

@@ -1,0 +1,21 @@
+name: Feature request
+description: Something mcp-testmate should check, catch, or report
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What broke (or almost broke) that this would catch?
+      description: Concrete incidents beat hypotheticals — they set priority.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What should mcp-testmate do?
+    validations:
+      required: true
+  - type: input
+    id: workaround
+    attributes:
+      label: Current workaround, if any

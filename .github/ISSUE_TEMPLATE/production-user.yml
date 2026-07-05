@@ -1,0 +1,49 @@
+name: I run MCP in production
+description: Tell us about your production MCP setup — this directly shapes what gets built next
+labels: [production-user]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks — production reports are the highest-signal input we get. A few quick questions:
+  - type: dropdown
+    id: transport
+    attributes:
+      label: Server transport
+      options:
+        - Streamable HTTP
+        - stdio
+        - Both
+        - Other / legacy SSE
+    validations:
+      required: true
+  - type: input
+    id: hosting
+    attributes:
+      label: Where does it run?
+      placeholder: "e.g. Cloud Run, ECS, a VM, Vercel, on-prem"
+    validations:
+      required: true
+  - type: textarea
+    id: what-broke
+    attributes:
+      label: What broke recently?
+      description: Schema change, silent drift after a dependency bump, downtime a client noticed before you did, a client-specific failure — whatever actually happened.
+    validations:
+      required: true
+  - type: dropdown
+    id: probing-interest
+    attributes:
+      label: Interested in hosted scheduled probing?
+      description: A paid service that probes your production server on a schedule — uptime, drift, latency — with alerts and status pages.
+      options:
+        - "Yes — I'd want this"
+        - "Maybe — tell me more when it exists"
+        - "No — CI checks are enough for us"
+    validations:
+      required: true
+  - type: input
+    id: contact
+    attributes:
+      label: Best way to reach you (optional)
+      placeholder: "email / X / leave blank to keep it in this issue"
