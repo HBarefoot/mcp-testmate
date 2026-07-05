@@ -1,0 +1,85 @@
+name: "mcp-testmate"
+description: "Schema drift detection for MCP servers — snapshot your tools, fail CI on breaking changes"
+author: "Henry Barefoot"
+branding:
+  icon: "check-circle"
+  color: "purple"
+
+inputs:
+  url:
+    description: "Streamable-HTTP MCP endpoint to check (overrides the committed config's target)"
+    required: false
+    default: ""
+  stdio:
+    description: 'stdio server launch command, e.g. "node server.mjs" (overrides the committed config''s target)'
+    required: false
+    default: ""
+  fail-on:
+    description: "Severity that fails the build: breaking | warning"
+    required: false
+    default: "breaking"
+  working-directory:
+    description: "Directory containing mcp-testmate.config.json and .mcp-testmate/ (default: repo root)"
+    required: false
+    default: "."
+  start:
+    description: >-
+      Command to launch your MCP server in the background before checking an
+      HTTP target, e.g. "node server.mjs". The action waits until `url`
+      responds (30s timeout). Not needed for stdio targets — the CLI spawns
+      those itself.
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+
+    - name: Start MCP server
+      if: inputs.start != ''
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        MTM_START: ${{ inputs.start }}
+        MTM_URL: ${{ inputs.url }}
+      run: |
+        nohup bash -c "$MTM_START" > "$RUNNER_TEMP/mcp-testmate-server.log" 2>&1 &
+        if [ -n "$MTM_URL" ]; then
+          for i in $(seq 1 30); do
+            # any HTTP response (even 4xx — MCP endpoints reject GETs) means the server is up
+            if curl -s -o /dev/null "$MTM_URL"; then
+              echo "server is up at $MTM_URL (${i}s)"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::error::server did not become reachable at $MTM_URL within 30s"
+          echo "--- server log ---"
+          cat "$RUNNER_TEMP/mcp-testmate-server.log" || true
+          exit 1
+        else
+          sleep 2
+        fi
+
+    - name: Check for schema drift
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        MTM_URL: ${{ inputs.url }}
+        MTM_STDIO: ${{ inputs.stdio }}
+        MTM_FAIL_ON: ${{ inputs.fail-on }}
+      run: |
+        args=(check --fail-on "$MTM_FAIL_ON")
+        [ -n "$MTM_URL" ] && args+=(--url "$MTM_URL")
+        [ -n "$MTM_STDIO" ] && args+=(--stdio "$MTM_STDIO")
+        # Prefer the repo's own pinned install (devDependency) when present;
+        # fall back to the latest published release.
+        if [ -x node_modules/.bin/mcp-testmate ]; then
+          echo "using local mcp-testmate ($(node_modules/.bin/mcp-testmate --version))"
+          node_modules/.bin/mcp-testmate "${args[@]}"
+        else
+          npx --yes mcp-testmate@latest "${args[@]}"
+        fi
