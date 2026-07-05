@@ -1,0 +1,77 @@
+{
+  "mcpTestmate": 1,
+  "createdAt": "2026-07-05T04:25:02.672Z",
+  "target": {
+    "type": "http",
+    "url": "http://127.0.0.1:7399/mcp"
+  },
+  "server": {
+    "name": "demo-server",
+    "version": "1.2.3"
+  },
+  "capabilities": [
+    "resources",
+    "tools"
+  ],
+  "tools": [
+    {
+      "name": "add",
+      "description": "Add two numbers",
+      "inputSchema": {
+        "properties": {
+          "a": {
+            "type": "number"
+          },
+          "b": {
+            "type": "number"
+          },
+          "precision": {
+            "description": "Decimal places (optional)",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "a",
+          "b"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "name": "echo",
+      "description": "Echo a message back",
+      "inputSchema": {
+        "properties": {
+          "message": {
+            "description": "Text to echo",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "name": "get_time",
+      "description": "Current server time as ISO string",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      }
+    }
+  ],
+  "resources": [
+    {
+      "uri": "demo://readme",
+      "name": "readme",
+      "mimeType": "text/plain"
+    }
+  ],
+  "prompts": [],
+  "timings": {
+    "connectMs": 28,
+    "listToolsMs": 2
+  }
+}

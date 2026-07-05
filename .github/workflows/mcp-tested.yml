@@ -1,0 +1,31 @@
+# Dogfood: run the mcp-testmate GitHub Action against this repo's own
+# fixture server, using the committed baseline at the repo root.
+# The weekly cron matters: schema drift happens WITHOUT code changes when a
+# dependency or remote server updates.
+name: MCP-tested
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 6 * * 1" # Mondays 06:00 UTC
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install and link local CLI (dogfood the pinned-install path)
+        run: |
+          npm ci
+          mkdir -p node_modules/.bin
+          ln -sf "$PWD/bin/cli.mjs" node_modules/.bin/mcp-testmate
+      - name: Check fixture server for drift
+        uses: ./
+        with:
+          start: node test/fixtures/demo-server.mjs 7399
+          url: http://127.0.0.1:7399/mcp
