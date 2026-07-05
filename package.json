@@ -1,0 +1,13 @@
+{
+  "name": "mcp-testmate",
+  "version": "0.0.1",
+  "description": "Testing, snapshot regression, and reliability monitoring for MCP servers. Schema drift detection, response regression, latency baselines, and CI for the Model Context Protocol. Coming soon.",
+  "bin": { "mcp-testmate": "bin/cli.mjs" },
+  "type": "module",
+  "keywords": ["mcp", "model-context-protocol", "testing", "ci", "snapshot-testing", "schema-drift", "regression-testing", "conformance", "monitoring", "reliability", "mcp-server", "github-action"],
+  "author": "Henry Barefoot (https://barefootdigital.dev)",
+  "license": "MIT",
+  "repository": { "type": "git", "url": "https://github.com/HBarefoot/mcp-testmate" },
+  "engines": { "node": ">=20" },
+  "files": ["bin", "README.md", "LICENSE"]
+}
